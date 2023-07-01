@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  db:
+    container_name: poder-postgres
+    image: postgres:latest
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - ${DATABASE_PORT}:5432
+    networks:
+      - portainer_default
+    restart: unless-stopped
+    volumes:
+      - ./datas:/var/lib/postgresql/data
+
+networks:
+  portainer_default:
+    external: true
+
+volumes:
+  datas:
