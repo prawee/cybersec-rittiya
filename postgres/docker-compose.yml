@@ -2,7 +2,7 @@ version: '3'
 
 services:
   db:
-    container_name: poder-postgres
+    container_name: poder-postgres-rittiya
     image: postgres:latest
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
