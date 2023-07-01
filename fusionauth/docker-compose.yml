@@ -1,0 +1,52 @@
+version: "3"
+services:
+  search:
+    container_name: poder-auth-search-rittiya
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    environment:
+      xpack.security.enabled: false
+      cluster.name: auth
+      bootstrap.memory_lock: "true"
+      discovery.type: single-node
+      ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+    networks:
+      - portainer_default
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+  auth:
+    container_name: poder-auth-rittiya
+    image: fusionauth/fusionauth-app:latest
+    depends_on:
+      - search
+    environment:
+      DATABASE_URL: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      FUSIONAUTH_APP_MEMORY: '512M'
+      FUSIONAUTH_APP_RUNTIME_MODE: 'production'
+      FUSIONAUTH_APP_SILENT_MODE: 'true'
+      FUSIONAUTH_APP_HTTP_PORT: '9100'
+      ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+      SEARCH_SERVERS: http://search:9200
+      SEARCH_TYPE: elasticsearch
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    networks:
+      - portainer_default
+    volumes:
+      - fa_config:/usr/local/fusionauth/config
+networks:
+  portainer_default:
+    external: true
+volumes:
+  es_data:
+  fa_config:
